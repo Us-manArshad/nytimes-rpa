@@ -1,15 +1,14 @@
-import os
 from abc import abstractmethod, ABC
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
 
 from RPA.Browser.Selenium import Selenium
+from RPA.Excel.Files import Files
 from RPA.HTTP import HTTP
 
-from selenium.webdriver.remote.webelement import WebElement
 
-from config import DOWNLOAD_IMAGES_PATH
+from config import DOWNLOAD_IMAGES_PATH, EXCEL_FILE
 
 
 @dataclass
@@ -66,6 +65,8 @@ class BaseBot(ABC):
     """
     actions_config: list[ActionConfig] = []
     browser: Selenium
+    files = Files()
+    http = HTTP()
 
     def __init__(self, params: dict, xpaths_mapper: dict):
         """
@@ -118,3 +119,16 @@ class BaseBot(ABC):
                 if step.pre_conditions or step.post_conditions:
                     self.get_extra_logic_method(xpath_name=step.xpath_name)
                 self.take_actions(step=step, action=action)
+
+    def write_excel_file(self):
+        """
+        It will write data into execl file
+        """
+        table_data = defaultdict(list)
+        for item in self.data:
+            item = dict(item)
+            for key, value in item.items():
+                table_data[key].append(value)
+        w = self.files.create_workbook(EXCEL_FILE)
+        w.append_worksheet("Sheet", table_data, header=True, start=1)
+        w.save()

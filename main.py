@@ -3,8 +3,6 @@ import os
 import re
 from urllib.parse import urlparse
 
-from RPA.Excel.Files import Files
-from RPA.HTTP import HTTP
 from SeleniumLibrary.errors import ElementNotFound
 from dateutil.relativedelta import relativedelta
 from selenium.webdriver.common.by import By
@@ -23,8 +21,6 @@ if not os.path.exists(DOWNLOAD_IMAGES_PATH):
 
 class NewsBot(BaseBot):
     browser = BotBrowser(url=URL).open()
-    files = Files()
-    http = HTTP()
 
     actions_config = [
         ActionConfig(
@@ -196,23 +192,8 @@ class NewsBot(BaseBot):
         It will search and write the data in excel file in output folder
         :return:
         """
-        data = list(bot.get_data())
-        table_data = {
-            "title": [],
-            "description": [],
-            "date": [],
-            "picture_name": [],
-            "search_phrase_in_title": [],
-            "search_phrase_in_description": [],
-            "is_contains_amount": [],
-        }
-        for item in data:
-            item = dict(item)
-            for key, value in item.items():
-                table_data[key].append(value)
-        w = self.files.create_workbook(EXCEL_FILE)
-        w.append_worksheet("Sheet", table_data, header=True, start=1)
-        w.save()
+        self.get_data()
+        self.write_excel_file()
 
 
 if __name__ == '__main__':
