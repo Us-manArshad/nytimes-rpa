@@ -173,7 +173,7 @@ class NewsBot(BaseBot):
 
         start_date = (current_date - relativedelta(months=self.months - 1)).strftime("%m/%d/%Y")
         if self.months < 2:
-            start_date = current_date.strftime("%m/%d/%Y")
+            start_date = current_date.replace(day=1).strftime("%m/%d/%Y")
             end_date = start_date
         date = {
             'text': start_date
